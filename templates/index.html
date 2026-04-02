@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pumping Lemma Visual Lab</title>
+    <meta name="description" content="Interactive visual simulator for the Pumping Lemma for Regular Languages — Theory of Computation">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --orange: #F97316;
+            --orange-light: #FDBA74;
+            --blue: #2563EB;
+            --blue-light: #60A5FA;
+            --header: #1E3A8A;
+            --navy: #0F172A;
+            --canvas: #F4EDE2;
+            --canvas-dark: #E8DFD3;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --text-muted: #64748B;
+            --success: #22C55E;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --font: 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+            font-family: var(--font);
+            background-color: var(--canvas);
+            /* Dense 5-pointed actual star vector background */
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cpath transform='translate(20,30) scale(0.5)' fill='rgba(15, 23, 42, 0.6)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(150,50) scale(0.4)' fill='rgba(15, 23, 42, 0.3)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(80,180) scale(0.8)' fill='rgba(15, 23, 42, 0.4)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(240,120) scale(0.5)' fill='rgba(15, 23, 42, 0.5)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(180,260) scale(0.35)' fill='rgba(15, 23, 42, 0.2)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(60,240) scale(0.6)' fill='rgba(15, 23, 42, 0.45)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(260,30) scale(0.6)' fill='rgba(15, 23, 42, 0.7)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cpath transform='translate(10,100) scale(0.4)' fill='rgba(15, 23, 42, 0.5)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(80,20) scale(0.5)' fill='rgba(15, 23, 42, 0.6)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(150,140) scale(0.6)' fill='rgba(15, 23, 42, 0.4)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3Cpath transform='translate(60,180) scale(0.3)' fill='rgba(15, 23, 42, 0.3)' d='M12 2l2.4 7.6H22l-6.2 4.6 2.4 8L12 17.6l-6.2 4.6 2.4-8L2 9.6h7.6z'/%3E%3C/svg%3E"),
+                radial-gradient(at 0% 0%, rgba(249, 115, 22, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.1) 0px, transparent 50%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, transparent 100%);
+            background-size: 300px 300px, 200px 200px, 100% 100%, 100% 100%, 100% 100%;
+            background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ─── Navbar ─────────────────────────────────────────── */
+        .navbar {
+            background: var(--header);
+            padding: 0.9rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.25);
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .navbar-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--orange), #EA580C);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.85rem;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .navbar h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .navbar-badge {
+            background: rgba(255,255,255,0.12);
+            color: var(--orange-light);
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        /* ─── Layout ─────────────────────────────────────────── */
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ─── Cards ──────────────────────────────────────────── */
+        .card {
+            background: var(--white);
+            border-radius: 18px;
+            padding: 1.75rem;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 6px 24px rgba(15,23,42,0.06);
+            border: 1px solid rgba(15,23,42,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(15,23,42,0.08), 0 12px 32px rgba(15,23,42,0.1);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--navy);
+        }
+        .section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .icon-orange { background: #FFF7ED; color: var(--orange); }
+        .icon-blue { background: #EFF6FF; color: var(--blue); }
+        .icon-green { background: #F0FDF4; color: var(--success); }
+        .icon-purple { background: #FAF5FF; color: #A855F7; }
+
+        /* ─── Sidebar Card (dark) ────────────────────────────── */
+        .card-dark {
+            background: var(--navy);
+            color: #E2E8F0;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .card-dark .section-title { color: #F1F5F9; }
+        .card-dark .section-icon.icon-blue { background: rgba(37,99,235,0.15); }
+        .card-dark:hover {
+            box-shadow: 0 2px 6px rgba(15,23,42,0.15), 0 12px 32px rgba(15,23,42,0.25);
+        }
+
+        /* ─── Input Grid ─────────────────────────────────────── */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group { margin-bottom: 1.15rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 0.45rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .card-dark .form-group label { color: #94A3B8; }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #F8FAFC;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+            background: #fff;
+        }
+        .form-input::placeholder { color: #94A3B8; }
+
+        /* Dark inputs */
+        .card-dark .form-input {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.1);
+            color: #E2E8F0;
+        }
+        .card-dark .form-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Slider */
+        .slider-container { display: flex; align-items: center; gap: 1rem; }
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--orange), var(--blue));
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--orange);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+            transition: transform 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+        .slider-value {
+            background: var(--orange);
+            color: #fff;
+            font-weight: 800;
+            padding: 0.35rem 0.85rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        /* ─── Buttons ────────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.7rem 1.4rem;
+            border-radius: 12px;
+            font-family: var(--font);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+        }
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange), #EA580C);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(249,115,22,0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 22px rgba(249,115,22,0.45);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--blue);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(37,99,235,0.25);
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 6px 22px rgba(37,99,235,0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid #E2E8F0;
+        }
+        .btn-ghost:hover { background: #F8FAFC; color: var(--text); }
+
+        .btn-group { display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.25rem; }
+
+        /* ─── Character Boxes ────────────────────────────────── */
+        .viz-section { margin-bottom: 1.5rem; }
+        .char-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 1rem 0;
+            justify-content: center;
+        }
+        .char-box {
+            width: 46px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            font-family: 'Courier New', monospace;
+            border: 2.5px solid;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .char-box:hover { transform: translateY(-5px) scale(1.12); z-index: 2; }
+
+        .char-x {
+            background: #EFF6FF;
+            border-color: var(--blue);
+            color: var(--blue);
+            box-shadow: 0 3px 12px rgba(37,99,235,0.15);
+        }
+        .char-x:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.3); }
+
+        .char-y {
+            background: #FFF7ED;
+            border-color: var(--orange);
+            color: var(--orange);
+            box-shadow: 0 3px 12px rgba(249,115,22,0.15);
+        }
+        .char-y:hover { box-shadow: 0 6px 25px rgba(249,115,22,0.45); }
+
+        .char-z {
+            background: #F8FAFC;
+            border-color: #94A3B8;
+            color: #64748B;
+            box-shadow: 0 2px 8px rgba(100,116,139,0.1);
+        }
+
+        .segment-label {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .label-x { color: var(--blue); }
+        .label-y { color: var(--orange); }
+        .label-z { color: #94A3B8; }
+
+        /* Pumped string */
+        .pumped-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px dashed #E2E8F0;
+        }
+        .pumped-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+        .pumped-label sup { color: var(--orange); font-weight: 900; }
+
+        /* ─── Pump Controls ──────────────────────────────────── */
+        .pump-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.25rem 0;
+        }
+        .pump-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 2px solid;
+            font-size: 1.3rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .pump-btn-minus {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .pump-btn-minus:hover { background: #FEF2F2; transform: scale(1.08); }
+        .pump-btn-plus {
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .pump-btn-plus:hover { background: #F0FDF4; transform: scale(1.08); }
+        .pump-display {
+            min-width: 70px;
+            text-align: center;
+        }
+        .pump-display .pump-num {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--orange);
+            line-height: 1;
+        }
+        .pump-display .pump-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ─── Steps ──────────────────────────────────────────── */
+        .step-list { display: grid; gap: 0.6rem; }
+        .step-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 1rem 1.15rem;
+            transition: all 0.3s ease;
+        }
+        .step-item:hover { background: #F1F5F9; border-color: #CBD5E1; }
+        .step-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.3rem;
+        }
+        .step-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        .step-detail {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* ─── Result Banners ─────────────────────────────────── */
+        .result-banner {
+            border-radius: 16px;
+            padding: 1.15rem 1.35rem;
+            margin-top: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .result-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .result-contradiction {
+            background: #FEF2F2;
+            border: 2px solid #FECACA;
+        }
+        .result-contradiction .result-icon { background: #FEE2E2; }
+        .result-contradiction .result-title { color: var(--danger); }
+
+        .result-success {
+            background: #F0FDF4;
+            border: 2px solid #BBF7D0;
+        }
+        .result-success .result-icon { background: #DCFCE7; }
+        .result-success .result-title { color: var(--success); }
+
+        .result-warning {
+            background: #FFFBEB;
+            border: 2px solid #FDE68A;
+        }
+        .result-warning .result-icon { background: #FEF3C7; }
+        .result-warning .result-title { color: var(--warning); }
+
+        .result-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .result-message {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+        .result-explanation {
+            font-size: 0.82rem;
+            color: #94A3B8;
+            margin-top: 0.35rem;
+        }
+
+        /* ─── Tooltip ────────────────────────────────────────── */
+        .tip {
+            position: relative;
+            cursor: help;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #FFF7ED;
+            color: var(--orange);
+            font-size: 0.6rem;
+            font-weight: 900;
+            margin-left: 0.35rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .tip:hover { background: var(--orange); color: #fff; transform: scale(1.1); }
+        .tip-text {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) scale(0.92);
+            background: var(--navy);
+            color: #CBD5E1;
+            padding: 0.7rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            line-height: 1.5;
+            width: 250px;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            z-index: 50;
+        }
+        .tip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--navy);
+        }
+        .tip:hover .tip-text {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+            pointer-events: auto;
+        }
+
+        /* ─── Legend ──────────────────────────────────────────── */
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 5px;
+            border: 2px solid;
+        }
+        .dot-x { background: #EFF6FF; border-color: var(--blue); }
+        .dot-y { background: #FFF7ED; border-color: var(--orange); }
+        .dot-z { background: #F8FAFC; border-color: #94A3B8; }
+
+        /* ─── Hero Empty ─────────────────────────────────────── */
+        .hero-empty { text-align: center; padding: 3rem 1rem; }
+        .hero-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero-title { font-size: 1.3rem; font-weight: 800; color: var(--navy); margin-bottom: 0.4rem; }
+        .hero-sub { color: var(--text-muted); font-size: 0.92rem; max-width: 480px; margin: 0 auto; }
+
+        /* ─── Example Info (dark card) ───────────────────────── */
+        .example-info .step-item {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+        }
+        .example-info .step-title { color: #94A3B8; }
+        .example-info .step-detail { color: #94A3B8; }
+
+        /* ─── Footer ─────────────────────────────────────────── */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #94A3B8;
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
+        /* ─── Responsive ─────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .input-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .navbar { padding: 0.75rem 1rem; }
+            .navbar h1 { font-size: 1rem; }
+            .container { padding: 1rem; }
+            .card { padding: 1.25rem; border-radius: 14px; }
+            .char-box { width: 38px; height: 46px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Navbar ───────────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-logo">PL</div>
+            <h1>Pumping Lemma Visual Lab</h1>
+        </div>
+        <div class="navbar-badge">Theory of Computation</div>
+    </nav>
+
+    <!-- ─── Main Content ─────────────────────────────────── -->
+    <div class="container">
+
+        <!-- ─── Theory Card ────────────────────────────── -->
+        <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--white) 0%, #FAFAFA 100%);">
+            <div class="section-title">
+                <div class="section-icon icon-blue" style="background: rgba(37,99,235,0.1);">📘</div>
+                What is the Pumping Lemma?
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                The <strong>Pumping Lemma for Regular Languages</strong> is a theorem used to prove that a language is <strong>not regular</strong>. It states that for any regular language, there exists a "pumping length" <em>p</em> such that any string <em>w</em> in the language with length ≥ <em>p</em> can be split into three parts: <strong>w = xyz</strong>, satisfying:
+            </p>
+            <ul style="font-size: 0.9rem; color: var(--navy); margin-left: 2rem; margin-bottom: 1rem; font-weight: 500;">
+                <li style="margin-bottom: 0.25rem;"><strong>|xy| ≤ p</strong> : The prefix and pumped part together are shorter than or equal to <em>p</em>.</li>
+                <li style="margin-bottom: 0.25rem;"><strong>|y| > 0</strong> : The middle part <em>y</em> cannot be empty.</li>
+                <li><strong>xy<sup>i</sup>z ∈ L</strong> for all <strong>i ≥ 0</strong> : You can "pump" <em>y</em> any number of times, and the resulting string must still be in the language.</li>
+            </ul>
+            <p style="font-size: 0.85rem; color: var(--text-muted); background: #EFF6FF; padding: 0.8rem; border-radius: 8px; border-left: 4px solid var(--blue);">
+                <strong>How to use this tool:</strong> Use the config below to pick a language, a string w, and decompose it into x, y, and z. If we find an <strong><em>i</em></strong> where the pumped string breaks the language conditions, it proves the language is <strong>not regular!</strong> 
+            </p>
+        </div>
+
+        <form method="POST" action="/pump" id="mainForm">
+
+            <!-- ─── Input Section ────────────────────────── -->
+            <div class="input-grid">
+
+                <!-- Left: Input Config (light card) -->
+                <div class="card" style="animation-delay: 0.05s;">
+                    <div class="section-title">
+                        <div class="section-icon icon-orange">✏️</div>
+                        Input Configuration
+                        <span class="tip">?<span class="tip-text">Enter a string and set the pumping length. The string will be decomposed into x, y, z where |xy| ≤ p and |y| &gt; 0.</span></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>String (w)</label>
+                        <input type="text" name="string" class="form-input"
+                               placeholder="e.g. aaabbb, 000111 …"
+                               value="{{ string }}" autocomplete="off" spellcheck="false">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pumping Length (p)
+                            <span class="tip">?<span class="tip-text">The pumping length p determines the max length of prefix xy. For the Pumping Lemma: |xy| ≤ p and |y| &gt; 0.</span></span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" name="pumping_length" min="1" max="10"
+                                   value="{{ pumping_length }}" id="pSlider"
+                                   oninput="document.getElementById('pVal').textContent=this.value">
+                            <div class="slider-value" id="pVal">{{ pumping_length }}</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" name="action" value="pump" class="btn btn-primary">🔬 Analyze &amp; Pump</button>
+                        <button type="submit" name="action" value="reset" class="btn btn-ghost">↺ Reset</button>
+                    </div>
+                </div>
+
+                <!-- Right: Examples (dark card / sidebar style) -->
+                <div class="card card-dark" style="animation-delay: 0.12s;">
+                    <div class="section-title">
+                        <div class="section-icon icon-blue">📚</div>
+                        Predefined Examples
+                        <span class="tip">?<span class="tip-text">Select a well-known non-regular language and load a sample string. The app will check if pumping creates a contradiction.</span></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Choose a Language</label>
+                        <select name="selected_example" class="form-input" id="exampleSelect">
+                            <option value="">— Custom Input —</option>
+                            {% for ex in examples %}
+                            <option value="{{ ex.id }}" {% if selected_example == ex.id %}selected{% endif %}>{{ ex.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {% for ex in examples %}
+                    <div class="example-info" id="info-{{ ex.id }}" style="display: {% if selected_example == ex.id %}block{% else %}none{% endif %};">
+                        <div class="step-item" style="animation-delay: 0s; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);">
+                            <div class="step-title">Description</div>
+                            <div class="step-detail" style="color: #CBD5E1;">{{ ex.description }}</div>
+                            <div class="step-detail" style="margin-top: 0.4rem; color: #94A3B8;">Sample: <code style="color: var(--orange); font-weight: 700;">{{ ex.sample }}</code></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="btn-group" style="margin-top: 1rem;">
+                        <button type="submit" name="action" value="load_example" class="btn btn-secondary">⚡ Try Example</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden pump_count -->
+            <input type="hidden" name="pump_count" value="{{ pump_count }}" id="pumpCountField">
+
+            {% if result %}
+            <!-- ─── Visualization ────────────────────────── -->
+            <div class="card viz-section">
+                <div class="section-title">
+                    <div class="section-icon icon-purple">🧬</div>
+                    String Decomposition
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot dot-x"></div> <span style="color:var(--blue)">x (prefix)</span></div>
+                    <div class="legend-item"><div class="legend-dot dot-y"></div> <span style="color:var(--orange)">y (pump)</span></div>
+                    <div class="legend-item"><div class="legend-dot dot-z"></div> <span style="color:#94A3B8">z (suffix)</span></div>
+                </div>
+
+                <!-- Original string -->
+                <div style="text-align:center; margin-bottom: 0.4rem;">
+                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">ORIGINAL: w = xyz</span>
+                </div>
+                <div class="char-row">
+                    {% for char in result.original_chars %}
+                        {% if loop.index0 < result.x_len %}
+                            <div class="char-box char-x" style="animation-delay: {{ loop.index0 * 0.05 }}s;">{{ char }}</div>
+                        {% elif loop.index0 < result.x_len + result.y_len %}
+                            <div class="char-box char-y" style="animation-delay: {{ loop.index0 * 0.05 }}s;">{{ char }}</div>
+                        {% else %}
+                            <div class="char-box char-z" style="animation-delay: {{ loop.index0 * 0.05 }}s;">{{ char }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="segment-label">
+                    {% if result.x_len > 0 %}<span class="label-x">x = "{{ result.x }}"</span>{% endif %}
+                    <span class="label-y">y = "{{ result.y }}"</span>
+                    <span class="label-z">z = "{{ result.z }}"</span>
+                </div>
+
+                <!-- Pump Controls -->
+                <div class="pump-controls">
+                    <button type="submit" name="action" value="pump_down" class="pump-btn pump-btn-minus">−</button>
+                    <div class="pump-display">
+                        <div class="pump-num">{{ pump_count }}</div>
+                        <div class="pump-label">i (power)</div>
+                    </div>
+                    <button type="submit" name="action" value="pump_up" class="pump-btn pump-btn-plus">+</button>
+                </div>
+
+                <!-- Pumped string -->
+                <div class="pumped-section">
+                    <div class="pumped-label">PUMPED: xy<sup>{{ pump_count }}</sup>z &nbsp;·&nbsp; {{ result.pumped | length }} characters</div>
+                    <div class="char-row">
+                        {% set ns = namespace(idx=0) %}
+                        {% for char in result.pumped_x %}
+                            <div class="char-box char-x" style="animation-delay: {{ ns.idx * 0.04 }}s;">{{ char }}</div>
+                            {% set ns.idx = ns.idx + 1 %}
+                        {% endfor %}
+                        {% for char in result.pumped_y %}
+                            <div class="char-box char-y" style="animation-delay: {{ ns.idx * 0.04 }}s;">{{ char }}</div>
+                            {% set ns.idx = ns.idx + 1 %}
+                        {% endfor %}
+                        {% for char in result.pumped_z %}
+                            <div class="char-box char-z" style="animation-delay: {{ ns.idx * 0.04 }}s;">{{ char }}</div>
+                            {% set ns.idx = ns.idx + 1 %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Explanation Panel ────────────────────── -->
+            <div class="card" style="animation-delay: 0.2s; margin-bottom: 1.5rem;">
+                <div class="section-title">
+                    <div class="section-icon icon-green">📖</div>
+                    Step-by-Step Explanation
+                </div>
+                <div class="step-list">
+                    {% for step in result.steps %}
+                    <div class="step-item">
+                        <div class="step-title">{{ step.title }}</div>
+                        <div class="step-value">{{ step.value }}</div>
+                        <div class="step-detail">{{ step.detail }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if result.contradiction %}
+                    {% if result.contradiction.found == true %}
+                    <div class="result-banner result-contradiction">
+                        <div class="result-icon">💥</div>
+                        <div>
+                            <div class="result-title">Contradiction Found → Language is NOT Regular!</div>
+                            <div class="result-message">{{ result.contradiction.message }}</div>
+                            <div class="result-explanation">{{ result.contradiction.explanation }}</div>
+                        </div>
+                    </div>
+                    {% elif result.contradiction.found == false %}
+                    <div class="result-banner result-success">
+                        <div class="result-icon">✅</div>
+                        <div>
+                            <div class="result-title">Still Satisfies Conditions</div>
+                            <div class="result-message">{{ result.contradiction.message }}</div>
+                            <div class="result-explanation">{{ result.contradiction.explanation }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="result-banner result-warning">
+                        <div class="result-icon">⚠️</div>
+                        <div>
+                            <div class="result-title">Invalid Input</div>
+                            <div class="result-message">{{ result.contradiction.message }}</div>
+                            <div class="result-explanation">{{ result.contradiction.explanation }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            {% else %}
+            <!-- ─── Empty State ──────────────────────────── -->
+            <div class="card">
+                <div class="hero-empty">
+                    <div class="hero-icon">🔬</div>
+                    <div class="hero-title">Ready to Explore the Pumping Lemma</div>
+                    <div class="hero-sub">Enter a string above or try a predefined example to see the decomposition, pumping animation, and contradiction detection in action.</div>
+                </div>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <footer class="footer">
+        Pumping Lemma Visual Lab · Theory of Computation · Built with 🧡
+    </footer>
+
+    <script>
+        document.getElementById('exampleSelect').addEventListener('change', function() {
+            document.querySelectorAll('.example-info').forEach(function(el) { el.style.display = 'none'; });
+            if (this.value) {
+                var info = document.getElementById('info-' + this.value);
+                if (info) info.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
