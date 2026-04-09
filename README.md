@@ -1,110 +1,86 @@
-# 🔬 Pumping Lemma Visual Lab
+# Pumping Lemma Simulator
 
-An interactive web simulation for demonstrating the **Pumping Lemma for Regular Languages** — a core concept in the Theory of Computation.
-
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)
-![Deploy](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render)
+An interactive web-based tool to simulate and visualize the **Pumping Lemma** for both Regular and Context-Free Languages — built as part of my Theory of Computation (TOC) coursework.
 
 ---
 
-## 🎯 What It Does
+## Why I built this
 
-Enter a string, set a pumping length, and watch the app:
+This started as an assignment for my TOC course (CSE core). The pumping lemma is one of those concepts that looks straightforward on paper but gets slippery fast when you're actually trying to apply it — especially figuring out how to pick the decomposition, why certain strings fail, and what "all values of i" actually means in practice.
 
-1. **Decompose** the string into **x**, **y**, **z** (satisfying |xy| ≤ p, |y| > 0)
-2. **Visualize** each character as colored boxes — blue (x), orange (y), grey (z)
-3. **Pump** the y-segment (y → y² → y³ …) with animated transitions
-4. **Detect contradictions** — if the pumped string leaves the language, it proves the language is **not regular**
+I could've put together something minimal just to submit. But somewhere along the way I thought — if I'm already doing this, why not build it properly? Going through the full thing by myself (HTML, CSS, JS — no frameworks, no libraries) turned out to be a good way to actually sharpen those basics, which I'd been meaning to do for a while.
 
-## ✨ Features
+So it became two things at once: an assignment I could be proud of, and a personal exercise in building something functional from scratch.
 
-- 🎨 **Modern UI** — Light canvas background, dark navy sidebar, glassmorphism-inspired cards
-- 📚 **5 Predefined Examples** — 0ⁿ1ⁿ, aⁿbⁿ, ww, palindromes, prime-length strings
-- 🔬 **Step-by-Step Explanation** — Decomposition, length conditions, pumped result
-- 💥 **Contradiction Detection** — Visual alerts when pumped string violates the language
-- ℹ️ **Tooltips** — Hover for theory explanations
-- 📱 **Responsive** — Works on desktop and mobile
+---
 
-## 🛠️ Tech Stack
+## What it does
 
-| Layer    | Technology     |
-| -------- | -------------- |
-| Backend  | Python + Flask |
-| Frontend | HTML + CSS     |
-| Server   | Gunicorn       |
-| Hosting  | Render         |
+- **Regular Language checker** — Tests whether a given string can be pumped according to the pumping lemma for regular languages, with step-by-step decomposition into `xyz`
+- **Context-Free Language checker** — Handles CFL pumping lemma logic with `uvxyz` decomposition
+- Lets you input custom strings and languages and walks through each condition interactively
+- Visual feedback for each pumping attempt — so you can see exactly where and why a string fails or passes
+- Clean, responsive UI that works on desktop and mobile
 
-## 📁 Project Structure
+---
 
-```
-pumping-lemma-lab/
-├── app.py                 # Flask app — routes, pumping logic, language checkers
-├── templates/
-│   └── index.html         # Full UI — HTML + inline CSS + minimal JS
-├── requirements.txt       # Python dependencies
-├── render.yaml            # Render deployment config
-├── .gitignore             # Git ignore rules
-└── README.md              # This file
-```
+## Tech stack
 
-## 🚀 Run Locally
+Vanilla HTML, CSS, and JavaScript — no frameworks, no build tools. Just the browser.
+
+I deliberately kept it dependency-free. Part of the point was to get comfortable with the fundamentals without leaning on abstractions.
+
+---
+
+## Live demo
+
+Deployed on Render: [TOC Pumping Lemma Simulator](https://toc-pumping-lemma-simulator.onrender.com)
+
+---
+
+## Running locally
+
+No setup needed.
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/pumping-lemma-lab.git
-cd pumping-lemma-lab
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Run the app
-python app.py
-
-# 4. Open in browser
-# → http://localhost:5050
+git clone https://github.com/vikasr1503/TOC_Pumping_Lemma_Simulator.git
+cd TOC_Pumping_Lemma_Simulator
 ```
 
-## 🌐 Deploy on Render
-
-### Option A: Auto-deploy with `render.yaml`
-
-1. Push this repo to GitHub
-2. Go to [render.com](https://render.com) → **New** → **Blueprint**
-3. Connect your GitHub repo
-4. Render auto-detects `render.yaml` and deploys
-
-### Option B: Manual setup
-
-1. Go to [render.com](https://render.com) → **New** → **Web Service**
-2. Connect your GitHub repo
-3. Set the following:
-   - **Runtime**: Python
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
-4. Click **Deploy**
-
-## 🎨 Color Palette
-
-| Color          | Hex       | Usage                     |
-| -------------- | --------- | ------------------------- |
-| Primary Orange | `#F97316` | Buttons, highlights, CTAs |
-| Secondary Blue | `#2563EB` | Secondary actions, links  |
-| Dark Blue      | `#1E3A8A` | Top navbar background     |
-| Navy Dark      | `#0F172A` | Sidebar / examples card   |
-| Light BG       | `#F4EDE2` | Main canvas background    |
-
-## 📖 Theory Background
-
-The **Pumping Lemma** states that for any regular language L, there exists a pumping length p such that any string w ∈ L with |w| ≥ p can be split into w = xyz where:
-
-- |xy| ≤ p
-- |y| > 0
-- For all i ≥ 0, xy^i z ∈ L
-
-If we can find a string where pumping produces a string **outside** the language, we have a **contradiction**, proving the language is **not regular**.
+Then just open `index.html` in your browser. That's it.
 
 ---
 
-live deployed link : https://toc-pumping-lemma-simulator-1.onrender.com/
-Built with 🧡 for Theory of Computation
+## Project structure
+
+```
+TOC_Pumping_Lemma_Simulator/
+├── index.html        # Entry point and layout
+├── style.css         # Styling and responsive layout
+├── script.js         # Core simulation logic
+└── README.md
+```
+
+---
+
+## Concepts covered
+
+- Pumping Lemma for Regular Languages
+- Pumping Lemma for Context-Free Languages
+- String decomposition and pumping conditions
+- Formal language theory (CSE / TOC)
+
+---
+
+## Course context
+
+**Subject:** Theory of Computation (TOC)
+**Branch:** Computer Science Engineering (CSE Core)
+
+---
+
+## Notes
+
+This isn't a research tool — it's a learning aid. The goal was to make the pumping lemma less abstract for students (including myself) who are seeing it for the first time. If you're studying TOC and find this useful, that's exactly what it was meant for.
+
+Feedback and suggestions are welcome — open an issue or just drop a message.
