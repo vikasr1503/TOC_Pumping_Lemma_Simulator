@@ -34,7 +34,7 @@ I deliberately kept it dependency-free. Part of the point was to get comfortable
 
 ## Live demo
 
-Deployed on Render: [TOC Pumping Lemma Simulator](https://toc-pumping-lemma-simulator.onrender.com)
+Deployed on Render: [TOC Pumping Lemma Simulator](https://toc-pumping-lemma-simulator.onrender.com/)
 
 ---
 
