@@ -27,7 +27,7 @@ So it became two things at once: an assignment I could be proud of, and a person
 ## Tech stack
 
 Vanilla HTML, CSS, and JavaScript — no frameworks, no build tools. Just the browser.
-https://toc-pumping-lemma-simulator-1.onrender.com/
+
 I deliberately kept it dependency-free. Part of the point was to get comfortable with the fundamentals without leaning on abstractions.
 
 ---
